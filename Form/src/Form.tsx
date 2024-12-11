@@ -3,9 +3,11 @@ function Form() {
 
 
   return (
-    <div className="form">
-      <div className="inner-container">
-        <form noValidate>
+    <div className="flex justify-center relative bg-cover bg-center" id='main-container'>
+      <div className="flex items-center justify-center">
+        <form noValidate className="bg-white p-8 shadow-md rounded-2xl">
+          <p>Sign Up Today!</p>
+          <p>Join Craft</p>
           <div className="form-group">
             <label htmlFor="name">Name:</label>
             <input type="text" id="name" name="name" required />
