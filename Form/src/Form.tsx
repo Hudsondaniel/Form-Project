@@ -1,6 +1,44 @@
 
 function Form() {
 
+  // Validate email input
+  const emailInput = document.getElementById('email') as HTMLInputElement; 
+
+  if (emailInput) {
+    emailInput.addEventListener('input', (e) => {
+      const target = e.target as HTMLInputElement; 
+      const emailValue = target.value; // Get the input value
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; // Regex for email validation
+  
+      // Find the error message span
+      const errorMessage = document.getElementById('email-error') as HTMLElement;
+  
+      // Validate the email input value
+      if (!emailRegex.test(emailValue)) {
+        target.classList.add('border-red-500');
+        target.classList.remove('border-gray-300');
+        // Show the error message
+        if (errorMessage) {
+          errorMessage.classList.remove('hidden');
+        }
+      } else {
+        target.classList.remove('border-red-500');
+        target.classList.add('border-gray-300');
+        // Hide the error message
+        if (errorMessage) {
+          errorMessage.classList.add('hidden');
+        }
+      }
+    });
+  } else {
+    console.log('Element with id "email" not found');
+  }
+  
+  
+  
+  
+
+
 
   return (
       <div className="flex justify-center items-center min-h-screen bg-gray-100" id="main-container">
@@ -35,6 +73,7 @@ function Form() {
                 className="p-2 rounded-md bg-gray-50 border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Enter your email"
               />
+              <span id="email-error" className="text-red-500 text-sm mt-1 hidden">Please enter a valid email address.</span>
             </div>
 
             {/* Country */}
