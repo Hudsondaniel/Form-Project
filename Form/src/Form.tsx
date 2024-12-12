@@ -139,6 +139,7 @@ function Form() {
               placeholder="Enter your password"
               value={password}
               onChange={handlePasswordChange}
+              autoComplete="new-password"
             />
             {passwordError && <span className="text-red-500 text-sm mt-1">Please enter a strong password (min 8 characters, 1 uppercase, 1 number, 1 special character).</span>}
           </div>
@@ -154,6 +155,7 @@ function Form() {
               placeholder="Confirm your password"
               value={confirmPassword}
               onChange={handleConfirmPasswordChange}
+              autoComplete="new-password"
             />
             {confirmPasswordError && <span className="text-red-500 text-sm mt-1">Passwords do not match.</span>}
           </div>
