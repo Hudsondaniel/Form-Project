@@ -4,41 +4,76 @@ function Form() {
   // State for the inputs and error messages
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [country, setCountry] = useState('');
+
+  // Error states
   const [nameError, setNameError] = useState(false);
   const [emailError, setEmailError] = useState(false);
+  const [passwordError, setPasswordError] = useState(false);
+  const [confirmPasswordError, setConfirmPasswordError] = useState(false);
+  const [countryError, setCountryError] = useState(false);
 
+  // Handlers for input changes
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const nameValue = e.target.value;
     const nameRegex = /^[a-zA-Z ]{2,30}$/;
-    
     setName(nameValue);
-
-    // Validate name
-    if (!nameRegex.test(nameValue)) {
-      setNameError(true);
-    } else {
-      setNameError(false);
-    }
+    setNameError(!nameRegex.test(nameValue));
   };
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const emailValue = e.target.value;
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    
     setEmail(emailValue);
+    setEmailError(!emailRegex.test(emailValue));
+  };
 
-    // Validate email
-    if (!emailRegex.test(emailValue)) {
-      setEmailError(true);
-    } else {
-      setEmailError(false);
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const passwordValue = e.target.value;
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    setPassword(passwordValue);
+    setPasswordError(!passwordRegex.test(passwordValue));
+  };
+
+  const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const confirmPasswordValue = e.target.value;
+    setConfirmPassword(confirmPasswordValue);
+    setConfirmPasswordError(confirmPasswordValue !== password);
+  };
+
+  const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const countryValue = e.target.value;
+    setCountry(countryValue);
+    setCountryError(countryValue === '');
+  };
+
+  // Handle form submission
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    // Validate all fields
+    const isFormValid =
+      !nameError &&
+      !emailError &&
+      !passwordError &&
+      !confirmPasswordError &&
+      country !== '';
+
+    if (!isFormValid) {
+      setCountryError(country === '');
+      alert('Please fix the errors before submitting.');
+      return;
     }
+
+    alert('Form submitted successfully!');
   };
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100" id="main-container">
       <div className="flex items-center justify-center w-full max-w-sm">
-        <form noValidate className="bg-white p-6 shadow-lg rounded-xl w-full">
+        <form noValidate className="bg-white p-6 shadow-lg rounded-xl w-full" onSubmit={handleSubmit}>
           <p className="text-xl font-bold text-gray-800 pb-4 text-center">Sign Up</p>
           <p className="text-gray-500 font-bold pb-5 text-sm text-center">Welcome To Craft!</p>
 
@@ -54,7 +89,7 @@ function Form() {
               value={name}
               onChange={handleNameChange}
             />
-            {nameError && <span id="name-error" className="text-red-500 text-sm mt-1">Please enter a valid full name</span>}
+            {nameError && <span className="text-red-500 text-sm mt-1">Please enter a valid full name</span>}
           </div>
 
           {/* Email */}
@@ -69,7 +104,7 @@ function Form() {
               value={email}
               onChange={handleEmailChange}
             />
-            {emailError && <span id="email-error" className="text-red-500 text-sm mt-1">Please enter a valid email address.</span>}
+            {emailError && <span className="text-red-500 text-sm mt-1">Please enter a valid email address.</span>}
           </div>
 
           {/* Country */}
@@ -79,7 +114,9 @@ function Form() {
               id="country"
               name="country"
               required
-              className="p-2 rounded-md bg-gray-50 border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className={`p-2 rounded-md bg-gray-50 border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${countryError ? 'border-red-500' : 'border-gray-300'}`}
+              value={country}
+              onChange={handleCountryChange}
             >
               <option value="">Select your country</option>
               <option value="us">United States</option>
@@ -88,6 +125,7 @@ function Form() {
               <option value="uk">United Kingdom</option>
               <option value="au">Australia</option>
             </select>
+            {countryError && <span className="text-red-500 text-sm mt-1">Please select your country.</span>}
           </div>
 
           {/* Password */}
@@ -97,9 +135,12 @@ function Form() {
               type="password"
               id="password"
               name="password"
-              className="p-2 rounded-md bg-gray-50 border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className={`p-2 rounded-md bg-gray-50 border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${passwordError ? 'border-red-500' : 'border-gray-300'}`}
               placeholder="Enter your password"
+              value={password}
+              onChange={handlePasswordChange}
             />
+            {passwordError && <span className="text-red-500 text-sm mt-1">Please enter a strong password (min 8 characters, 1 uppercase, 1 number, 1 special character).</span>}
           </div>
 
           {/* Confirm Password */}
@@ -109,9 +150,12 @@ function Form() {
               type="password"
               id="confirmPassword"
               name="confirmPassword"
-              className="p-2 rounded-md bg-gray-50 border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className={`p-2 rounded-md bg-gray-50 border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${confirmPasswordError ? 'border-red-500' : 'border-gray-300'}`}
               placeholder="Confirm your password"
+              value={confirmPassword}
+              onChange={handleConfirmPasswordChange}
             />
+            {confirmPasswordError && <span className="text-red-500 text-sm mt-1">Passwords do not match.</span>}
           </div>
 
           {/* Submit Button */}
