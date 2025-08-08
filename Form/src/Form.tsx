@@ -72,33 +72,6 @@ function Form() {
       return;
     }
 
-    // VULNERABLE: Execute XSS if comment contains script
-    if (comment.includes('<script>') || comment.includes('alert(') || comment.includes('onerror=') || comment.includes('onload=')) {
-      // Extract script content and execute it
-      const scriptMatch = comment.match(/<script>(.*?)<\/script>/i);
-      if (scriptMatch) {
-        try {
-          eval(scriptMatch[1]);
-        } catch (error) {
-          console.error('XSS execution failed:', error);
-        }
-      } else {
-        // For other XSS payloads, create element and append
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = comment;
-        document.body.appendChild(tempDiv);
-        
-        setTimeout(() => {
-          if (document.body.contains(tempDiv)) {
-            document.body.removeChild(tempDiv);
-          }
-        }, 1000);
-      }
-      
-      // Don't show the success alert if XSS was executed
-      return;
-    }
-
     alert('Form submitted successfully!');
   };
 
