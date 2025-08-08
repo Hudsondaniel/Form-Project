@@ -7,6 +7,7 @@ function Form() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [country, setCountry] = useState('');
+  const [comment, setComment] = useState('');
 
   // Error states
   const [nameError, setNameError] = useState(false);
@@ -49,6 +50,10 @@ function Form() {
     setCountryError(countryValue === '');
   };
 
+  const handleCommentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setComment(e.target.value);
+  };
+
   // Handle form submission
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -64,6 +69,33 @@ function Form() {
     if (!isFormValid) {
       setCountryError(country === '');
       alert('Please fix the errors before submitting.');
+      return;
+    }
+
+    // VULNERABLE: Execute XSS if comment contains script
+    if (comment.includes('<script>') || comment.includes('alert(') || comment.includes('onerror=') || comment.includes('onload=')) {
+      // Extract script content and execute it
+      const scriptMatch = comment.match(/<script>(.*?)<\/script>/i);
+      if (scriptMatch) {
+        try {
+          eval(scriptMatch[1]);
+        } catch (error) {
+          console.error('XSS execution failed:', error);
+        }
+      } else {
+        // For other XSS payloads, create element and append
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = comment;
+        document.body.appendChild(tempDiv);
+        
+        setTimeout(() => {
+          if (document.body.contains(tempDiv)) {
+            document.body.removeChild(tempDiv);
+          }
+        }, 1000);
+      }
+      
+      // Don't show the success alert if XSS was executed
       return;
     }
 
@@ -126,6 +158,26 @@ function Form() {
               <option value="au">Australia</option>
             </select>
             {countryError && <span className="text-red-500 text-sm mt-1">Please select your country.</span>}
+          </div>
+
+          {/* Comment Field - VULNERABLE TO XSS */}
+          <div className="flex flex-col mb-3 pb-2">
+            <label htmlFor="comment" className="text-gray-700 pb-1 text-sm font-semibold">Comments</label>
+            <textarea
+              id="comment"
+              name="comment"
+              className="p-2 rounded-md bg-gray-50 border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 border-gray-300"
+              placeholder="Enter your comments..."
+              value={comment}
+              onChange={handleCommentChange}
+              rows={3}
+            />
+            {/* VULNERABLE: Directly rendering user input without sanitization */}
+            {comment && (
+              <div className="mt-2 p-2 bg-green-50 rounded">
+                <p>Your comment: <span dangerouslySetInnerHTML={{ __html: comment }}></span></p>
+              </div>
+            )}
           </div>
 
           {/* Password */}
